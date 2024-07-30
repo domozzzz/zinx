@@ -6,17 +6,20 @@ from downloader import download_thread
 
 __all__ = ('run_gui')
 
+TITLE = "zinx"
 WINDOW_WIDTH = 400
 WINDOW_HEIGHT = 200
 
-default_file_location = 'C:/'
+DEFAULT_DESTINATION_FOLDER = 'C:/'
 
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("zinx")
-        self.folder_location = ""
+        self.title(TITLE)
+        self.destination_folder = DEFAULT_DESTINATION_FOLDER
+        self.screen_init()
 
+    def screen_init(self):
         self.geometry(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}")
 
         screen_width = self.winfo_screenwidth()
@@ -37,15 +40,15 @@ class App(tk.Tk):
             file_path = filedialog.askdirectory()
             if file_path:
                 folder_location_label.configure(text=file_path)
-                folder_location = file_path
+                self.folder_location = file_path + "/"
 
-        folder_location_label = tk.Label(self, text=default_file_location)
+        folder_location_label = tk.Label(self, text=DEFAULT_DESTINATION_FOLDER)
         folder_location_label.pack()
 
         folder_location_button = tk.Button(self, command=choose_folder_location)
         folder_location_button.pack()
 
-        submit_button = tk.Button(self, text="Submit", command=lambda: download_thread(self, entry.get(), self.folder_location))
+        submit_button = tk.Button(self, text="Download", command=lambda: download_thread(self, entry.get(), self.folder_location))
         submit_button.pack()
 
         self.progress_var = tk.DoubleVar()
