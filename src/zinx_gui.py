@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
-
 from downloader import download_thread
 
 __all__ = ('run_gui')
@@ -17,6 +16,8 @@ class App(tk.Tk):
         super().__init__()
         self.title(TITLE)
         self.destination_path = DEFAULT_DESTINATION_PATH
+        self.style = ttk.Style(self)
+        self.style.theme_use('clam')  # You can choose 'clam', 'alt', 'default', or 'classic'
         self.init_frame()
         self.init_components()
 
@@ -38,33 +39,43 @@ class App(tk.Tk):
         self.create_download_button()
         self.create_progress_bar()
 
-
     def create_source_url_entry(self):
+        # Frame for URL entry
+        frame = ttk.Frame(self, padding="10 10 10 10")
+        frame.grid(row=0, column=0, sticky=(tk.W, tk.E))
+
         # Source url label
-        source_url_label = tk.Label(self, text="Url")
-        source_url_label.pack()
+        source_url_label = ttk.Label(frame, text="Url")
+        source_url_label.grid(row=0, column=0, sticky=tk.W)
 
         # Source url entry
-        self.source_url_entry = tk.Entry(self, width=40)
-        self.source_url_entry.pack()
+        self.source_url_entry = ttk.Entry(frame, width=40)
+        self.source_url_entry.grid(row=0, column=1, sticky=(tk.W, tk.E))
     
     def create_download_button(self):
-        download_button = tk.Button(self, text="Download", command=self.start_download)
-        download_button.pack()
+        download_button = ttk.Button(self, text="Download", command=self.start_download)
+        download_button.grid(row=3, column=0, columnspan=2, pady=10)
 
     def create_destination_path_selector(self):
+        # Frame for destination path selector
+        frame = ttk.Frame(self, padding="10 10 10 10")
+        frame.grid(row=1, column=0, sticky=(tk.W, tk.E))
+
         # Label
-        self.destination_path_label = tk.Label(self, text=DEFAULT_DESTINATION_PATH)
-        self.destination_path_label.pack()
+        self.destination_path_label = ttk.Label(frame, text=DEFAULT_DESTINATION_PATH)
+        self.destination_path_label.grid(row=0, column=0, sticky=tk.W)
 
         # Button
-        destination_path_button = tk.Button(self, text="Select Destination", command=self.select_destination_path)
-        destination_path_button.pack()
+        destination_path_button = ttk.Button(frame, text="Select Path", command=self.select_destination_path)
+        destination_path_button.grid(row=0, column=1)
 
     def create_progress_bar(self):
+        frame = ttk.Frame(self, padding="10 10 10 10")
+        frame.grid(row=2, column=0, sticky=(tk.W, tk.E))
+
         self.progress_amount = tk.DoubleVar()
-        self.progress_bar = ttk.Progressbar(self, orient="horizontal", length=380, mode="determinate", variable=self.progress_amount)
-        self.progress_bar.pack(pady=10)
+        self.progress_bar = ttk.Progressbar(frame, orient="horizontal", length=380, mode="determinate", variable=self.progress_amount)
+        self.progress_bar.grid(row=0, column=0, columnspan=2, pady=10, sticky=(tk.W, tk.E))
 
     def select_destination_path(self):
         file_path = filedialog.askdirectory()
