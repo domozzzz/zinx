@@ -7,60 +7,70 @@ from downloader import download_thread
 __all__ = ('run_gui')
 
 TITLE = "zinx"
+DEFAULT_DESTINATION_PATH = 'C:/'
 WINDOW_WIDTH = 400
 WINDOW_HEIGHT = 200
 
-DEFAULT_DESTINATION_FOLDER = 'C:/'
 
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title(TITLE)
-        self.destination_folder = DEFAULT_DESTINATION_FOLDER
-        self.screen_init()
+        self.destination_path = DEFAULT_DESTINATION_PATH
+        self.init_frame()
+        self.init_components()
 
-    def screen_init(self):
+    def init_frame(self):
         self.geometry(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}")
 
+        # Get entire screen size
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
 
+        # Center window
         x_position = (screen_width // 2) - (WINDOW_WIDTH // 2)
         y_position = (screen_height // 2) - (WINDOW_HEIGHT // 2)
-
         self.geometry(f"+{x_position}+{y_position}")
 
-        input_label = tk.Label(self, text="Url")
-        input_label.pack()
+    def init_components(self):
 
-        entry = tk.Entry(self, width=40)
-        entry.pack()
+        # Source url label
+        source_url_label = tk.Label(self, text="Url")
+        source_url_label.pack()
+
+        # Source url entry
+        source_url_entry = tk.Entry(self, width=40)
+        source_url_entry.pack()
         
-        def choose_folder_location():
+        def select_destination_path():
             file_path = filedialog.askdirectory()
             if file_path:
-                folder_location_label.configure(text=file_path)
-                self.folder_location = file_path + "/"
+                destination_path_label.configure(text=file_path)
+                self.destination_path = file_path + "/"
 
-        folder_location_label = tk.Label(self, text=DEFAULT_DESTINATION_FOLDER)
-        folder_location_label.pack()
+        # Destination path label
+        destination_path_label = tk.Label(self, text=DEFAULT_DESTINATION_PATH)
+        destination_path_label.pack()
 
-        folder_location_button = tk.Button(self, command=choose_folder_location)
-        folder_location_button.pack()
+        # Destination path button
+        destination_path_button = tk.Button(self, command=select_destination_path)
+        destination_path_button.pack()
 
-        submit_button = tk.Button(self, text="Download", command=lambda: download_thread(self, entry.get(), self.folder_location))
-        submit_button.pack()
+        # Download button
+        download_button = tk.Button(self, text="Download", command=lambda: download_thread(self, source_url_entry.get(), self.destination_path))
+        download_button.pack()
 
-        self.progress_var = tk.DoubleVar()
-        self.progress = ttk.Progressbar(self, orient="horizontal", length=380, mode="determinate", variable=self.progress_var)
-        self.progress.pack(pady=10)
+        # Progress bar
+        self.progress_amount = tk.DoubleVar()
+        self.progress_bar = ttk.Progressbar(self, orient="horizontal", length=380, mode="determinate", variable=self.progress_amount)
+        self.progress_bar.pack(pady=10)
 
-    def print_progress(self, i):
+    def update_progress_bar(self, amount):
         self.update_idletasks()  # Update the GUI to reflect the progress
-        self.progress_var.set(i+1)
+        self.progress_amount.set(amount + 1)
 
-    def set_total(self, total):
-        self.progress.configure(maximum=total)
+    def set_progress_total(self, total):
+        self.progress_bar.configure(maximum=total)
 
 def run_gui():
     app = App()
