@@ -33,37 +33,47 @@ class App(tk.Tk):
         self.geometry(f"+{x_position}+{y_position}")
 
     def init_components(self):
+        self.create_source_url_entry()
+        self.create_destination_path_selector()
+        self.create_download_button()
+        self.create_progress_bar()
 
+
+    def create_source_url_entry(self):
         # Source url label
         source_url_label = tk.Label(self, text="Url")
         source_url_label.pack()
 
         # Source url entry
-        source_url_entry = tk.Entry(self, width=40)
-        source_url_entry.pack()
-        
-        def select_destination_path():
-            file_path = filedialog.askdirectory()
-            if file_path:
-                destination_path_label.configure(text=file_path)
-                self.destination_path = file_path + "/"
-
-        # Destination path label
-        destination_path_label = tk.Label(self, text=DEFAULT_DESTINATION_PATH)
-        destination_path_label.pack()
-
-        # Destination path button
-        destination_path_button = tk.Button(self, command=select_destination_path)
-        destination_path_button.pack()
-
-        # Download button
-        download_button = tk.Button(self, text="Download", command=lambda: download_thread(self, source_url_entry.get(), self.destination_path))
+        self.source_url_entry = tk.Entry(self, width=40)
+        self.source_url_entry.pack()
+    
+    def create_download_button(self):
+        download_button = tk.Button(self, text="Download", command=self.start_download)
         download_button.pack()
 
-        # Progress bar
+    def create_destination_path_selector(self):
+        # Label
+        self.destination_path_label = tk.Label(self, text=DEFAULT_DESTINATION_PATH)
+        self.destination_path_label.pack()
+
+        # Button
+        destination_path_button = tk.Button(self, text="Select Destination", command=self.select_destination_path)
+        destination_path_button.pack()
+
+    def create_progress_bar(self):
         self.progress_amount = tk.DoubleVar()
         self.progress_bar = ttk.Progressbar(self, orient="horizontal", length=380, mode="determinate", variable=self.progress_amount)
         self.progress_bar.pack(pady=10)
+
+    def select_destination_path(self):
+        file_path = filedialog.askdirectory()
+        if file_path:
+            self.destination_path_label.configure(text=file_path)
+            self.destination_path = file_path + "/"
+
+    def start_download(self):
+        download_thread(self, self.source_url_entry.get(), self.destination_path)
 
     def update_progress_bar(self, amount):
         self.update_idletasks()  # Update the GUI to reflect the progress
